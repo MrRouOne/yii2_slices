@@ -4,9 +4,9 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
+    'id' => 'basic',
     'name' => 'Copy Star',
     'language' => 'ru-RU',
-    'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
@@ -16,7 +16,7 @@ $config = [
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-            'cookieValidationKey' => 'KZISY_gs-xgEQh6yBl2FHmnzQBdVSkDU',
+            'cookieValidationKey' => 'duuFVvd7AEupcWLajDrtLW0NZZHdIUat',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -60,7 +60,7 @@ if (YII_ENV_DEV) {
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        'allowedIPs' => ['*'],
+        //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
 
     $config['bootstrap'][] = 'gii';

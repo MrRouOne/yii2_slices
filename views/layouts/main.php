@@ -26,11 +26,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <head>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <link rel="shortcut icon" href="web/kip.jpg" type="image/x-icon">
 </head>
-<body class="d-flex flex-column h-100">
+<body class="d-flex flex-column h-100" >
 <?php $this->beginBody() ?>
 
-<header id="header" style="margin-bottom: 4.5rem">
+<header id="header" style="margin-top: 6rem;">
     <?php
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
@@ -40,13 +41,18 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav'],
         'items' => [
-            Yii::$app->user->isGuest ? ['label' => 'Регистрация', 'url' => ['/site/register']] : '',
+            (!Yii::$app->user->isGuest && Yii::$app->user->identity->isAdmin())
+                ? ['label' => 'Админ панель', 'url' => ['/admin/']]
+                : '',
+            Yii::$app->user->isGuest
+                ? ['label' => 'Регистрация', 'url' => ['/site/register']]
+                : '',
             Yii::$app->user->isGuest
                 ? ['label' => 'Вход', 'url' => ['/site/login']]
                 : '<li class="nav-item">'
                 . Html::beginForm(['/site/logout'])
                 . Html::submitButton(
-                    'Выход (' . Yii::$app->user->identity->login . ')',
+                    'Выход',
                     ['class' => 'nav-link btn btn-link logout']
                 )
                 . Html::endForm()
@@ -57,11 +63,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     ?>
 </header>
 
-<main id="main" class="flex-shrink-0" role="main">
+<main id="main" class="flex-shrink-0 " role="main">
     <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
-            <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif ?>
         <?= $content ?>
     </div>
 </main>
@@ -69,8 +72,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <footer id="footer" class="mt-auto py-3 bg-light">
     <div class="container">
         <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy;<?= Yii::$app->name ?> <?= date('Y') ?></div>
-            <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
+            <div class="col-md-6 text-center text-md-start">&copy; <?= Yii::$app->name . ' ' . date('Y') ?></div>
         </div>
     </div>
 </footer>

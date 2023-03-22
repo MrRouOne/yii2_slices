@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -9,7 +10,6 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
-use app\models\User;
 
 class SiteController extends Controller
 {
@@ -87,23 +87,6 @@ class SiteController extends Controller
         ]);
     }
 
-    public function actionRegister()
-    {
-        $model = new User();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['site/login']);
-            }
-        } else {
-            $model->loadDefaultValues();
-        }
-
-        return $this->render('register', [
-            'model' => $model,
-        ]);
-    }
-
     /**
      * Logout action.
      *
@@ -116,5 +99,49 @@ class SiteController extends Controller
         return $this->goHome();
     }
 
+    /**
+     * Displays contact page.
+     *
+     * @return Response|string
+     */
+    public function actionContact()
+    {
+        $model = new ContactForm();
+        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
+            Yii::$app->session->setFlash('contactFormSubmitted');
+
+            return $this->refresh();
+        }
+        return $this->render('contact', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Displays about page.
+     *
+     * @return string
+     */
+    public function actionAbout()
+    {
+        return $this->render('about');
+    }
+
+    public function actionRegister()
+    {
+        $model = new User();
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['login']);
+            }
+        } else {
+            $model->loadDefaultValues();
+        }
+
+        return $this->render('register', [
+            'model' => $model,
+        ]);
+    }
 
 }
