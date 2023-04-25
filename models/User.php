@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
 /**
@@ -17,9 +18,9 @@ use yii\web\IdentityInterface;
  * @property string $password
  * @property int $is_admin
  */
-class User extends \yii\db\ActiveRecord implements IdentityInterface
+class User extends ActiveRecord implements IdentityInterface
 {
-    public $repeat_password;
+    public $repeatPassword;
     public $rules;
 
     /**
@@ -36,15 +37,31 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['name', 'surname', 'login', 'email', 'password', 'repeat_password', 'rules'], 'required',],
-            [['name', 'surname', 'patronymic'], 'match', 'pattern' => '/^[а-яё\s-]+$/iu', 'message' => "Поле {attribute} должно содержать только кириллицу, пробел и тире"],
-            [['login'], 'match', 'pattern' => '/^[a-z0-9-]+$/iu', 'message' => "Поле {attribute} должно содержать только латиницу, цифры и тире"],
+            [['name', 'surname', 'login', 'email', 'password', 'repeatPassword'], 'required'],
+            [
+                ['name', 'surname', 'patronymic'],
+                'match',
+                'pattern' => '/^[а-я\s-]*$/iu',
+                'message' => 'Значение «{attribute}» должно содержать только пробел, кирилицу и тире',
+            ],
+            [
+                ['login'],
+                'match',
+                'pattern' => '/^[a-z0-9-]*$/iu',
+                'message' => 'Значение «{attribute}» должно содержать только цифры, латиницу и тире',
+            ],
             [['rules'], 'boolean'],
+            [
+                ['rules'],
+                'match',
+                'pattern' => '/1/',
+                'message' => 'Обьязательно нужно согласиться с правилами регистрации'
+            ],
             [['login', 'email'], 'unique'],
             [['email'], 'email'],
             [['name', 'surname', 'patronymic', 'login', 'email', 'password'], 'string', 'max' => 255],
             [['password'], 'string', 'min' => 6],
-            ['repeat_password', 'compare', 'compareAttribute' => 'password'],
+            [['repeatPassword'], 'compare', 'compareAttribute' => 'password'],
         ];
     }
 
@@ -61,15 +78,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'login' => 'Логин',
             'email' => 'Почта',
             'password' => 'Пароль',
-            'repeat_password' => 'Повторите пароль',
+            'repeatPassword' => 'Повторите пароль',
             'rules' => 'Согласие с правилами регистрации',
         ];
-    }
-
-    public function beforeSave($insert)
-    {
-        $this->password = md5($this->password);
-        return parent::beforeSave($insert);
     }
 
     public static function findIdentity($id)
@@ -94,11 +105,22 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     public function validateAuthKey($authKey)
     {
-        return $this->authKey === $authKey;
+        return true;
     }
 
-    public function validatePassword($password): bool
+    public function beforeSave($insert)
     {
-        return md5($password) === $this->password;
+        $this->password = md5($this->password);
+        return parent::beforeSave($insert);
+    }
+
+    public function validatePassword($password)
+    {
+        return $this->password === md5($password);
+    }
+
+    public function isAdmin()
+    {
+        return $this->is_admin;
     }
 }
